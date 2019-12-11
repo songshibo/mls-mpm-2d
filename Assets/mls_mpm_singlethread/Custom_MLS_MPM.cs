@@ -93,7 +93,6 @@ public class Custom_MLS_MPM : MonoBehaviour
             uint2 cell_index = (uint2)p.pos;
             // cell_diff is a vector point from the center of the cell to the particle position
             float2 cell_diff = (p.pos - cell_index) - 0.5f;
-            Debug.Log("pos:"+p.pos+"\n"+"cell index:"+cell_index+"\n"+"cell_diff"+cell_diff);
             // quadratic interpolation
             // need 3 weights
             float2[] w = new float2[3];
