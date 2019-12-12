@@ -229,5 +229,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63ea7d499ed37e74086c8e89d148888e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  instance_mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+  instance_mesh: {fileID: -462981019419857548, guid: 8e144536c755e674594eb43ddcdef2c9,
+    type: 3}
   instance_material: {fileID: 2100000, guid: 28c30a30728fb5b4ca0e64afcd18c859, type: 2}

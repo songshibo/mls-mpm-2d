@@ -54,7 +54,7 @@ public class Custom_MLS_MPM : MonoBehaviour
         {
             Particle p = new Particle();
             p.pos = tmp[i];
-            p.v = math.float2(Random.value, Random.value) ;
+            p.v = math.float2(Random.value * 2 - 1, Random.value) ;
             p.mass = 1.0f;
             particles[i] = p;
         }
