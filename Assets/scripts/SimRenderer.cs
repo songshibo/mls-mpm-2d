@@ -3,8 +3,8 @@ using System.Collections;
 using Unity.Collections;
 
 public class SimRenderer : MonoBehaviour {
-    [SerializeField] Mesh instance_mesh;
-    [SerializeField] Material instance_material;
+    [SerializeField] Mesh instance_mesh = null;
+    [SerializeField] Material instance_material = null;
 
     // Compute buffers used for indirect mesh drawing
     ComputeBuffer point_buffer;

@@ -35,7 +35,7 @@ public class Custom_MLS_MPM : MonoBehaviour
     {
         List<float2> tmp = new List<float2>();
         const float spacing = 1.0f;
-        const int edge = 16;
+        const int edge = 32;
         float2 boxCenter = math.float2(grid_res / 2.0f, grid_res / 2.0f);
         // box center:(32,32),spacing: 1, generate 16 * 16 particles 
         for (float i = boxCenter.x - edge/2; i < boxCenter.x + edge/2; i += spacing)

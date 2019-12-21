@@ -26,6 +26,7 @@
                 float2 v;
                 float4 C;
                 float mass;
+                float padding;
             };
 
             struct v2f {
