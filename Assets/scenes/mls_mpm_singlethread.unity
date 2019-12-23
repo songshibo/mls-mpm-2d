@@ -149,6 +149,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b79cfe51345164f23b4a24ca4c22123b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  elastic_mu: 0.1
+  elastic_lambda: 60
   spacing: 0.5
   side_num: 8
   initV:

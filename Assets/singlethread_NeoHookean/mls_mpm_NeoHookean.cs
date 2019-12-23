@@ -27,8 +27,8 @@ public class mls_mpm_NeoHookean : MonoBehaviour
     const int grid_res = 64;
     const int cell_num = grid_res * grid_res;
     int particle_num = 0;
-    float elastic_mu = 20.0f;
-    float elastic_lambda = 10.0f;
+    public float elastic_mu = 20.0f;
+    public float elastic_lambda = 10.0f;
     public float spacing = 0.5f;
     public int side_num = 8;
     public float2 initV = 0;
