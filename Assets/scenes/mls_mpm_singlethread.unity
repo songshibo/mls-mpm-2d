@@ -155,7 +155,7 @@ MonoBehaviour:
   side_num: 8
   initV:
     x: 0
-    y: 2
+    y: 0
 --- !u!4 &197938193
 Transform:
   m_ObjectHideFlags: 0
