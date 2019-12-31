@@ -28,6 +28,10 @@ $$
 
 just loop through 9 surrounding cells and calculate each cell’s weight and sum together.
 
+##### Particle Initial Volume
+
+need to calculate cell mass first and convert mass back to particle with weight as particle density. $V_p^0 = \frac{M_p}{density}$  
+
 ##### P2G Momentum Contribution
 
 $$
@@ -35,6 +39,10 @@ m_p * C_p *(x_i - x_p) * w_{ip}
 $$
 
 $C_p$ is affine momentum matrix stored in each particle
+
+##### Stress Momentum Contribution
+
+
 
 ###### $C_p$ update
 

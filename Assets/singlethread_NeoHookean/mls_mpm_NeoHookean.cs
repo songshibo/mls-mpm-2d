@@ -3,9 +3,16 @@ using UnityEngine;
 using Unity.Mathematics;
 using Unity.Collections;
 using System.Runtime.InteropServices;
+using UnityEngine.UI;
 
 public class mls_mpm_NeoHookean : MonoBehaviour
 {
+    public enum volume_type
+    {
+        both,
+        init_volume,
+        sim_volume
+    }
     struct Particle
     {
         public float2 pos;
@@ -27,23 +34,75 @@ public class mls_mpm_NeoHookean : MonoBehaviour
     const int grid_res = 64;
     const int cell_num = grid_res * grid_res;
     int particle_num = 0;
+    // sim parameter
     public float elastic_mu = 20.0f;
     public float elastic_lambda = 10.0f;
     public float spacing = 0.5f;
     public int side_num = 8;
-    public float2 initV = 0;
     float2 rect_center = math.float2(grid_res / 2, grid_res / 2);
+
+
+    // Debug Rendering Part
+    [Space]
+    [ReadOnlyWhenPlaying]
+    public bool debug_render = true;
+    public volume_type volume_debug_type = volume_type.both;
+    public GameObject p_prefab;
+    public float render_range = 6.0f;
+    [ReadOnlyWhenPlaying]
+    public int coloum = 0;
+    [ReadOnlyWhenPlaying]
+    public int row = 0;
+    int track_index = 0;
+    List<GameObject> debug_list;
+    Text text;
+
 
     NativeArray<Particle> particles;
     NativeArray<Cell> grids;
     NativeArray<float2x2> Fs;
     SimRenderer sim;
 
+    string Convert2String(float2 input, string acc)
+    {
+        return input.x.ToString(acc) + "," + input.y.ToString(acc);
+    }
+
+    string Convert2String(float2x2 input, string acc)
+    {
+        return "[" + Convert2String(input.c0, acc) + " \n " + Convert2String(input.c1, acc) + "]";
+    } 
+
     void Start()
     {
         Initialize();
-        sim = GameObject.FindObjectOfType<SimRenderer>();
-        sim.Initialise(particle_num, Marshal.SizeOf(new Particle()));
+        if(!debug_render)
+        {
+            sim = GameObject.FindObjectOfType<SimRenderer>();
+            sim.Initialise(particle_num, Marshal.SizeOf(new Particle()));
+        }
+        else
+        {
+            text = GameObject.Find("Text").GetComponent<Text>();
+            debug_list = new List<GameObject>();
+            GameObject root = new GameObject("DebugRender");
+
+            track_index = coloum * (int)math.sqrt(particle_num) + row;
+            if (!(track_index < particle_num && track_index >= 0))
+            {
+                Debug.LogError("track_index is out of range");
+            }
+
+            for(int i = 0; i < particle_num; ++i)
+            {
+                float2 pos = (particles[i].pos - rect_center) / grid_res * render_range;
+                debug_list.Add(Instantiate(p_prefab, new Vector3(pos.x, pos.y, 0.0f), Quaternion.identity, root.transform) as GameObject);
+                if (i == track_index)
+                {
+                    debug_list[i].GetComponent<MeshRenderer>().material.SetColor("_Color", Color.red);
+                }
+            }
+        }
     }
     
     void Update()
@@ -52,7 +111,64 @@ public class mls_mpm_NeoHookean : MonoBehaviour
         {
             Simulate();
         }
-        sim.RenderFrame(particles);
+
+        if (!debug_render)
+        {
+            sim.RenderFrame(particles);
+        }
+        else
+        {
+            for(int i = 0; i < particle_num; ++i)
+            {
+                float2 pos = (particles[i].pos - rect_center) / grid_res * render_range;
+                float2 v = particles[i].v;
+                debug_list[i].transform.position = new Vector3(pos.x, pos.y, 0.0f);
+                Debug.DrawLine(debug_list[i].transform.position, debug_list[i].transform.position + new Vector3(v.x, v.y, 0.0f), Color.red);
+                switch(volume_debug_type)
+                {
+                    case volume_type.both:
+                        debug_list[i].transform.localScale = Vector3.one * 10.0f * math.determinant(Fs[i]) * particles[i].volume0 * 0.6f;
+                        break;
+                    case volume_type.init_volume:
+                        debug_list[i].transform.localScale = Vector3.one * 10.0f * particles[i].volume0 * 0.6f;
+                        break;
+                    case volume_type.sim_volume:
+                        debug_list[i].transform.localScale = Vector3.one * 10.0f * math.determinant(Fs[i]) * 0.3f;
+                        break;
+                }
+            }
+
+            text.text = "Index: " + track_index + "\n"
+                        + "Initial volume: " + particles[track_index].volume0.ToString("f3") + "\n"
+                        + "pos: (" + Convert2String(particles[track_index].pos, "f2") + ")\n"
+                        + "cell index: " + (uint2)particles[track_index].pos + "\n"
+                        + "velocity: (" + Convert2String(particles[track_index].v, "f2") + ")\n"
+                        + "affine momentum matrix: \n" + Convert2String(particles[track_index].C, "f2")+ "\n"
+                        + "deformation gradient: \n" + Convert2String(Fs[track_index], "f2") + "\n" + "Determinant:" + math.determinant(Fs[track_index]).ToString("f3");
+
+            
+            /* mouse selection (hard to use)
+            //if (Input.GetMouseButtonDown(0))
+            //{
+            //     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            //     RaycastHit hit;
+
+            //     if (Physics.Raycast(ray, out hit))
+            //     {
+            //         GameObject objectHit = hit.transform.gameObject;
+            //         int index = debug_list.IndexOf(objectHit);
+            //         Debug.Log(
+            //             "Hit Particle Index: " + index + "\n"
+            //             + "pos: " + particles[index].pos + "\n"
+            //             + "cell index: " + (uint2)particles[index].pos + "\n"
+            //             + "velocity: " + particles[index].v + "\n"
+            //             + "affine momentum matrix: " + particles[index].C + "\n"
+            //             + "deformation gradient: " + Fs[index]
+            //         );
+            //     }
+            // }
+            */
+        }
     }
 
     private void OnDestroy() 
@@ -82,7 +198,7 @@ public class mls_mpm_NeoHookean : MonoBehaviour
         {
             Particle p = new Particle();
             p.pos = tmp[i];
-            p.v = initV;
+            p.v = 0;
             p.C = 0;
             p.mass = 1.0f;
             particles[i] = p;
