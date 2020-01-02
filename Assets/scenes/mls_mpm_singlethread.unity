@@ -491,7 +491,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spacing: 0.5
-  init_edge: 16
+  init_edge: 32
+  useJobs: 1
+  usePrefab: 0
+  render_range: 6
+  particle_prefab: {fileID: 8132303915935936940, guid: 442dd5a6919114cfc8de053508c61b7b,
+    type: 3}
 --- !u!4 &985190988
 Transform:
   m_ObjectHideFlags: 0
