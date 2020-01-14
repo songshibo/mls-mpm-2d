@@ -402,10 +402,15 @@ public class mls_mpm_Fluid : MonoBehaviour
             float2 x_n = p.pos + p.v;
             float wall_min = 3;
             float wall_max = (float)grid_res - 4;
-            if (x_n.x < wall_min) p.v.x += wall_min - x_n.x;
-            if (x_n.x > wall_max) p.v.x += wall_max - x_n.x;
-            if (x_n.y < wall_min) p.v.y += wall_min - x_n.y;
-            if (x_n.y > wall_max) p.v.y += wall_max - x_n.y;
+            p.v.x += (x_n.x < wall_min)? wall_min - x_n.x: 0;
+            p.v.x += (x_n.x > wall_max)? wall_max - x_n.x: 0;
+            p.v.y += (x_n.y < wall_min)? wall_min - x_n.y: 0;
+            p.v.y += (x_n.y > wall_max)? wall_max - x_n.y: 0;
+            // if (x_n.x < wall_min) p.v.x += wall_min - x_n.x;
+            // if (x_n.x > wall_max) p.v.x += wall_max - x_n.x;
+            // if (x_n.y < wall_min) p.v.y += wall_min - x_n.y;
+            // if (x_n.y > wall_max) p.v.y += wall_max - x_n.y;
+
             ps[i] = p;
         }
     }

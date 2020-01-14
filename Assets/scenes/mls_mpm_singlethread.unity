@@ -175,8 +175,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 15
@@ -307,7 +305,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 6
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -447,8 +445,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25c92da9bb22c4131940abaa1738a495, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elastic_mu: 0.1
-  elastic_lambda: 60
+  elastic_mu: 20
+  elastic_lambda: 20
   spacing: 0.5
   side_num: 32
 --- !u!4 &859240984
