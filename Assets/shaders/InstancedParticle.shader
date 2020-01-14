@@ -2,6 +2,7 @@
     Properties {
         _Colour ("Colour", COLOR) = (1, 1, 1, 1)
         _Size ("Size", float) = 0.035
+        _Center ("Center", Vector) = (64, 64, 0, 0)
     }
 
     SubShader {
@@ -35,13 +36,14 @@
 
             float _Size;
             fixed4 _Colour;
+            fixed4 _Center;
 
             StructuredBuffer<Particle> particle_buffer;
 
             v2f vert (appdata_full v, uint instanceID : SV_InstanceID) {
                 // take in data from the compute buffer, filled with data each frame in SimRenderer
                 // offsetting and scaling it from the (0...grid_res, 0...grid_res) resolution of our sim into a nicer range for rendering
-                float4 data = float4((particle_buffer[instanceID].pos.xy - float2(32, 32)) * 0.1, 0, 1.0);
+                float4 data = float4((particle_buffer[instanceID].pos.xy - float2(_Center.x, _Center.y)) * 0.1, 0, 1.0);
                 
                 // Scaling vertices by our base size param (configurable in the material) and the mass of the particle
                 float3 localPosition = v.vertex.xyz * (_Size * data.w);

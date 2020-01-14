@@ -26,12 +26,12 @@ public class mls_mpm_Fluid : MonoBehaviour
         public float padding;
     };
 
-    const int grid_res = 64;
+    const int grid_res = 128;
     const int num_cell = grid_res * grid_res;
 
     const float dt = 0.2f;
     const int iterations = (int)(1 / dt);
-    const float gravity = -0.2f;
+    const float gravity = -0.25f;
     // fluid parameters
     const float rest_density = 4.0f;
     const float dynamic_viscosity = 0.1f;
@@ -81,7 +81,7 @@ public class mls_mpm_Fluid : MonoBehaviour
     void Initialize()
     {
         List<float2> init_pos = new List<float2>();
-        float2 center = math.float2(grid_res / 2, grid_res / 2);
+        float2 center = math.float2(grid_res / 2.0f, grid_res / 2.0f);
         for (float i = center.x - init_edge / 2; i < center.x + init_edge / 2; i += spacing)
         {
             for (float j = center.y - init_edge / 2; j < center.y + init_edge / 2; j += spacing)
@@ -104,7 +104,7 @@ public class mls_mpm_Fluid : MonoBehaviour
 
             if(usePrefab)
             {
-                float2 worldPos = (p.pos - 32) / grid_res * render_range;
+                float2 worldPos = (p.pos - grid_res/2.0f) / grid_res * render_range;
                 prefab_list.Add((Instantiate(particle_prefab, new Vector3(worldPos.x, worldPos.y, -.1f), Quaternion.identity) as GameObject).GetComponent<Transform>());
             }
         }
@@ -290,9 +290,11 @@ public class mls_mpm_Fluid : MonoBehaviour
                 0, -pressure
             );
 
-            float2x2 strain = p.C;
-            float trace = strain.c1.x + strain.c0.y;
-            strain.c0.y = strain.c1.x = trace;
+            float2x2 velocity_gradient = p.C;
+            float2x2 velocity_gradient_T = math.transpose(velocity_gradient);
+            float2x2 strain = velocity_gradient + velocity_gradient_T;
+            //float trace = strain.c1.x + strain.c0.y;
+            //strain.c0.y = strain.c1.x = trace;
 
             float2x2 viscosity_term = dynamic_viscosity * strain;
             stress += viscosity_term;
@@ -334,6 +336,7 @@ public class mls_mpm_Fluid : MonoBehaviour
                 c.v /= c.mass;
                 c.v += dt * math.float2(0, gravity);
 
+                /*
                 int x = i / grid_res;
                 int y = i % grid_res;
                 if (x < 2 || x > grid_res - 3)
@@ -344,6 +347,7 @@ public class mls_mpm_Fluid : MonoBehaviour
                 {
                     c.v.y = 0;
                 }
+                */
 
                 grid[i] = c;
             }
@@ -402,7 +406,6 @@ public class mls_mpm_Fluid : MonoBehaviour
             if (x_n.x > wall_max) p.v.x += wall_max - x_n.x;
             if (x_n.y < wall_min) p.v.y += wall_min - x_n.y;
             if (x_n.y > wall_max) p.v.y += wall_max - x_n.y;
-
             ps[i] = p;
         }
     }
@@ -418,7 +421,7 @@ public class mls_mpm_Fluid : MonoBehaviour
         public void Execute(int i, TransformAccess transform)
         {
             Particle p = ps[i];
-            transform.position = math.float3((p.pos - 32.0f)/grid_res * render_range , -.1f);
+            transform.position = math.float3((p.pos - grid_res/2)/grid_res * render_range , -.1f);
         }
     }
 
