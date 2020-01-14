@@ -535,7 +535,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 569a044424abc4733b347d9363d7bd4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spacing: 0.5
+  spacing: 0.2
   init_edge: 64
   useJobs: 1
   usePrefab: 0

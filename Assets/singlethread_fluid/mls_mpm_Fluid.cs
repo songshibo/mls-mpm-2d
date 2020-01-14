@@ -44,9 +44,11 @@ public class mls_mpm_Fluid : MonoBehaviour
     int num_particle = 0;
 
     [SerializeField]
+    [Range(0.1f, 1.99f)]
     float spacing = 0.5f;
     [SerializeField]
     int init_edge = 8;
+    float particle_mass = 1.0f;
     [SerializeField]
     bool useJobs = true;
 
@@ -65,6 +67,7 @@ public class mls_mpm_Fluid : MonoBehaviour
 
     void Start()
     {
+        particle_mass *= (spacing * spacing / 0.25f);//(spacing < 0.5f)?(spacing * spacing / 0.25f) : (spacing / 0.5f);
         prefab_list = usePrefab? new List<Transform>() : null;
         Initialize();
         if(usePrefab)
@@ -99,7 +102,7 @@ public class mls_mpm_Fluid : MonoBehaviour
             p.pos = init_pos[i];
             p.v = 0;
             p.C = 0;
-            p.mass = 1.0f;
+            p.mass = particle_mass;
             ps[i] = p;
 
             if(usePrefab)
@@ -336,7 +339,6 @@ public class mls_mpm_Fluid : MonoBehaviour
                 c.v /= c.mass;
                 c.v += dt * math.float2(0, gravity);
 
-                /*
                 int x = i / grid_res;
                 int y = i % grid_res;
                 if (x < 2 || x > grid_res - 3)
@@ -347,7 +349,6 @@ public class mls_mpm_Fluid : MonoBehaviour
                 {
                     c.v.y = 0;
                 }
-                */
 
                 grid[i] = c;
             }
@@ -400,8 +401,8 @@ public class mls_mpm_Fluid : MonoBehaviour
             p.pos = math.clamp(p.pos, 1, grid_res - 2);
 
             float2 x_n = p.pos + p.v;
-            float wall_min = 3;
-            float wall_max = (float)grid_res - 4;
+            float wall_min = 3 - 1;
+            float wall_max = (float)grid_res - 4 + 1;
             p.v.x += (x_n.x < wall_min)? wall_min - x_n.x: 0;
             p.v.x += (x_n.x > wall_max)? wall_max - x_n.x: 0;
             p.v.y += (x_n.y < wall_min)? wall_min - x_n.y: 0;
