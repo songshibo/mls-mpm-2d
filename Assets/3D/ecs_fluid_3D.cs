@@ -27,9 +27,9 @@ public class ecs_fluid_3D : MonoBehaviour
     };
 
     //* Simulation parameters
-    const float dt = 0.2f;
+    const float dt = 0.01f;
     const int iterations = (int)(1 / dt);
-    const float gravity = -0.25f;
+    const float gravity = -0.2f;
     //* Grid properties
     const int grid_res = 64;
     const int num_cell = grid_res * grid_res * grid_res;
@@ -40,7 +40,7 @@ public class ecs_fluid_3D : MonoBehaviour
     //* Initialization parameters
     float spacing = 0.5f;
     int num_edge = 8;
-    float init_mass = 0.1f;
+    float init_mass = 0.5f;
     //* fluid parameters
     const float rest_density = 4.0f;
     const float dynamic_viscosity = 0.1f;
@@ -52,7 +52,7 @@ public class ecs_fluid_3D : MonoBehaviour
     GameObject particle_prefab = null;
     List<Transform> prefab_list = null;
     TransformAccessArray ps_array;
-    float render_range = 6.0f;
+    float render_range = 1.0f;
 
     void Start()
     {
@@ -105,23 +105,20 @@ public class ecs_fluid_3D : MonoBehaviour
 
     void Update()
     {
-        // for (int i = 0; i < iterations; ++i)
-        // {
-        //     //Simulation();
-        // }
-
-        if (Input.GetKeyDown(KeyCode.DownArrow))
+        for (int i = 0; i < iterations; ++i)
         {
-            // for (int i = 0; i < iterations; ++i)
-            // {
-                ClearGrid_single();
-                P2G_first_single();
-                P2G_second_single();
-                UpdateGrid_single();
-                G2P_single();
-                PrefabRenderer_single();
-            //}
+            Simulation();
         }
+
+        // if (Input.GetKey(KeyCode.DownArrow))
+        // {
+        // ClearGrid_single();
+        // P2G_first_single();
+        // P2G_second_single();
+        // UpdateGrid_single();
+        // G2P_single();
+        // PrefabRenderer_single();
+        // }
     }
 
     void Simulation()
@@ -316,12 +313,12 @@ public class ecs_fluid_3D : MonoBehaviour
                 c.v /= c.mass;
                 c.v += dt * math.float3(0, gravity, 0);
 
-                // int z = i / (grid_res * grid_res);
-                // int x = (i - z * (grid_res * grid_res)) / grid_res;
-                // int y = (i - z * (grid_res * grid_res)) % grid_res;
-                // c.v.z = (z < 2)||(z > grid_res -3)?0:c.v.z;
-                // c.v.x = (x < 2)||(x > grid_res -3)?0:c.v.x;
-                // c.v.y = (y < 2)||(y > grid_res -3)?0:c.v.y;
+                int z = i / (grid_res * grid_res);
+                int x = (i - z * (grid_res * grid_res)) / grid_res;
+                int y = (i - z * (grid_res * grid_res)) % grid_res;
+                c.v.z = (z < 2)||(z > grid_res -3)?0:c.v.z;
+                c.v.x = (x < 2)||(x > grid_res -3)?0:c.v.x;
+                c.v.y = (y < 2)||(y > grid_res -3)?0:c.v.y;
 
                 grid[i] = c;
             }
@@ -373,8 +370,8 @@ public class ecs_fluid_3D : MonoBehaviour
             p.pos = math.clamp(p.pos, 1, grid_res - 2);
 
             float3 x_n = p.pos + p.v;
-            float wall_min = 3 - 1;
-            float wall_max = (float)grid_res - 4 + 1;
+            float wall_min = 3;
+            float wall_max = (float)grid_res - 4;
             p.v.x += (x_n.x < wall_min)? wall_min - x_n.x: 0;
             p.v.x += (x_n.x > wall_max)? wall_max - x_n.x: 0;
             p.v.y += (x_n.y < wall_min)? wall_min - x_n.y: 0;
@@ -531,12 +528,12 @@ public class ecs_fluid_3D : MonoBehaviour
                 c.v /= c.mass;
                 c.v += dt * math.float3(0, gravity, 0);
 
-                int y = i / (grid_res * grid_res);
-                int x = (i - y * (grid_res * grid_res)) / grid_res;
-                int z = (i - y * (grid_res * grid_res)) % grid_res;
-                c.v.z = (z < 2) || (z > grid_res - 3) ? 0 : c.v.z;
-                c.v.x = (x < 2) || (x > grid_res - 3) ? 0 : c.v.x;
-                c.v.y = (y < 2) || (y > grid_res - 3) ? 0 : c.v.y;
+                // int y = i / (grid_res * grid_res);
+                // int x = (i - y * (grid_res * grid_res)) / grid_res;
+                // int z = (i - y * (grid_res * grid_res) - x * grid_res);
+                // c.v.z = (z < 2) || (z > grid_res - 3) ? 0 : c.v.z;
+                // c.v.x = (x < 2) || (x > grid_res - 3) ? 0 : c.v.x;
+                // c.v.y = (y < 2) || (y > grid_res - 3) ? 0 : c.v.y;
 
                 grid[i] = c;
             }
