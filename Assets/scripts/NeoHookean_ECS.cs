@@ -25,10 +25,10 @@ public class NeoHookean_ECS : MonoBehaviour
         public float mass;
     };
 
-    const float dt = 0.1f;
+    const float dt = 0.05f;
     const int iterations = (int)(1.0f / dt);
-    const float gravity = -0.2f;
-    const int grid_res = 64;
+    const float gravity = -0.3f;
+    const int grid_res = 128;
     const int cell_num = grid_res * grid_res;
     int num_particle = 0;
 
@@ -43,7 +43,7 @@ public class NeoHookean_ECS : MonoBehaviour
     [SerializeField]
     [ReadOnlyWhenPlaying]
     int side_num = 8;
-    
+
     NativeArray<Particle> particles;
     NativeArray<float2x2> Fs;
     NativeArray<Cell> grids;
@@ -58,7 +58,7 @@ public class NeoHookean_ECS : MonoBehaviour
 
     void Update()
     {
-        for(int i = 0; i < iterations; ++i)
+        for (int i = 0; i < iterations; ++i)
         {
             Simulate();
         }
@@ -76,10 +76,10 @@ public class NeoHookean_ECS : MonoBehaviour
     void Initialize()
     {
         List<float2> tmp = new List<float2>();
-        float2 rect_center = math.float2(grid_res/2, grid_res/2);
-        for(float i = rect_center.x - side_num/2; i < rect_center.x + side_num/2; i += spacing)
+        float2 rect_center = math.float2(grid_res / 2, grid_res / 2);
+        for (float i = rect_center.x - side_num / 2; i < rect_center.x + side_num / 2; i += spacing)
         {
-            for(float j = rect_center.y - side_num/2; j < rect_center.y + side_num/2; j += spacing)
+            for (float j = rect_center.y - side_num / 2; j < rect_center.y + side_num / 2; j += spacing)
             {
                 tmp.Add(math.float2(i, j));
             }
@@ -88,7 +88,7 @@ public class NeoHookean_ECS : MonoBehaviour
         num_particle = tmp.Count;
         particles = new NativeArray<Particle>(num_particle, Allocator.Persistent);
         Fs = new NativeArray<float2x2>(num_particle, Allocator.Persistent);
-        for(int i = 0; i < num_particle; ++i)
+        for (int i = 0; i < num_particle; ++i)
         {
             Particle p = new Particle();
             p.pos = tmp[i];
@@ -103,7 +103,7 @@ public class NeoHookean_ECS : MonoBehaviour
         }
 
         grids = new NativeArray<Cell>(cell_num, Allocator.Persistent);
-        for(int i = 0; i < cell_num; ++i)
+        for (int i = 0; i < cell_num; ++i)
         {
             Cell c = new Cell();
             c.v = 0;
@@ -195,9 +195,9 @@ public class NeoHookean_ECS : MonoBehaviour
             w[1] = 0.75f - math.pow(cell_diff, 2);
             w[2] = 0.5f * math.pow(0.5f + cell_diff, 2);
 
-            for(uint x = 0; x < 3; ++x)
+            for (uint x = 0; x < 3; ++x)
             {
-                for(uint y = 0; y < 3; ++y)
+                for (uint y = 0; y < 3; ++y)
                 {
                     float weight = w[x].x * w[y].y;
                     uint2 current_index = math.uint2(cell_index.x + x - 1, cell_index.y + y - 1);
@@ -205,7 +205,7 @@ public class NeoHookean_ECS : MonoBehaviour
                     float2 Q = math.mul(p.C, dist);
 
                     int index_1d = (int)current_index.x * grid_res + (int)current_index.y;
-                    Cell c  = grids[index_1d];
+                    Cell c = grids[index_1d];
 
                     float mass_contribute = weight * p.mass;
                     c.mass += mass_contribute;
@@ -242,9 +242,9 @@ public class NeoHookean_ECS : MonoBehaviour
 
             float density = 0.0f;
 
-            for(int x = 0; x < 3; ++x)
+            for (int x = 0; x < 3; ++x)
             {
-                for(int y = 0; y < 3; ++y)
+                for (int y = 0; y < 3; ++y)
                 {
                     float weight = w[x].x * w[y].y;
                     int index_1d = ((int)cell_index.x + (x - 1)) * grid_res + ((int)cell_index.y + (y - 1));
@@ -285,8 +285,8 @@ public class NeoHookean_ECS : MonoBehaviour
         public void Execute(int i)
         {
             Cell c = grids[i];
-            
-            if(c.mass > 0)
+
+            if (c.mass > 0)
             {
                 c.v /= c.mass;
                 c.v += dt * math.float2(0, gravity);
@@ -294,8 +294,8 @@ public class NeoHookean_ECS : MonoBehaviour
                 //boundary condition
                 int x = i / grid_res;
                 int y = i % grid_res;
-                if (x < 2 || x > grid_res - 3) {c.v.x = 0;}
-                if (y < 2 || y > grid_res - 3) {c.v.y = 0;}
+                if (x < 2 || x > grid_res - 3) { c.v.x = 0; }
+                if (y < 2 || y > grid_res - 3) { c.v.y = 0; }
             }
 
             grids[i] = c;
@@ -326,13 +326,15 @@ public class NeoHookean_ECS : MonoBehaviour
 
             // C = B * (D^-1), D=1/4 * (delta_x)^2 * I when using quadratic interpolation
             float2x2 B = 0;
-            for (uint x = 0; x < 3; ++x) {
-                for (uint y = 0; y < 3; ++y) {
+            for (uint x = 0; x < 3; ++x)
+            {
+                for (uint y = 0; y < 3; ++y)
+                {
                     float weight = w[x].x * w[y].y;
 
                     uint2 current_index = math.uint2(cell_index.x + x - 1, cell_index.y + y - 1);
                     int index = (int)current_index.x * grid_res + (int)current_index.y;
-                    
+
                     float2 dist = (current_index - p.pos) + 0.5f;
                     float2 weighted_velocity = grids[index].v * weight;
 
@@ -350,7 +352,7 @@ public class NeoHookean_ECS : MonoBehaviour
 
             //deformation gradient update eqation-181
             float2x2 F_new = math.float2x2(
-                1, 0, 
+                1, 0,
                 0, 1
             );
             F_new += dt * p.C;
@@ -358,6 +360,6 @@ public class NeoHookean_ECS : MonoBehaviour
 
             particles[i] = p;
         }
-    } 
+    }
     #endregion
 }

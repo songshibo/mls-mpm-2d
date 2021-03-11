@@ -68,9 +68,9 @@ public class mls_mpm_Fluid : MonoBehaviour
     void Start()
     {
         particle_mass *= (spacing * spacing / 0.25f);//(spacing < 0.5f)?(spacing * spacing / 0.25f) : (spacing / 0.5f);
-        prefab_list = usePrefab? new List<Transform>() : null;
+        prefab_list = usePrefab ? new List<Transform>() : null;
         Initialize();
-        if(usePrefab)
+        if (usePrefab)
         {
             particle_array = new TransformAccessArray(prefab_list.ToArray());
         }
@@ -105,9 +105,9 @@ public class mls_mpm_Fluid : MonoBehaviour
             p.mass = particle_mass;
             ps[i] = p;
 
-            if(usePrefab)
+            if (usePrefab)
             {
-                float2 worldPos = (p.pos - grid_res/2.0f) / grid_res * render_range;
+                float2 worldPos = (p.pos - grid_res / 2.0f) / grid_res * render_range;
                 prefab_list.Add((Instantiate(particle_prefab, new Vector3(worldPos.x, worldPos.y, -.1f), Quaternion.identity) as GameObject).GetComponent<Transform>());
             }
         }
@@ -125,7 +125,7 @@ public class mls_mpm_Fluid : MonoBehaviour
     {
         for (int i = 0; i < iterations; ++i)
         {
-            if(useJobs)
+            if (useJobs)
             {
                 SimulationJobs();
             }
@@ -138,7 +138,7 @@ public class mls_mpm_Fluid : MonoBehaviour
             }
         }
 
-        if(!usePrefab)
+        if (!usePrefab)
             sim_renderer.RenderFrame(ps);
     }
 
@@ -182,7 +182,7 @@ public class mls_mpm_Fluid : MonoBehaviour
         }.Schedule(num_particle, (int)(init_edge / spacing));
         Profiler.EndSample();
 
-        if(usePrefab)
+        if (usePrefab)
         {
             Profiler.BeginSample("Prefab Render");
             new PrefabRenderer()
@@ -358,7 +358,7 @@ public class mls_mpm_Fluid : MonoBehaviour
     [BurstCompile]
     unsafe struct G2PJob : IJobParallelFor
     {
-        [ReadOnly]public NativeArray<Cell> grid;
+        [ReadOnly] public NativeArray<Cell> grid;
         public NativeArray<Particle> ps;
         public void Execute(int i)
         {
@@ -403,10 +403,10 @@ public class mls_mpm_Fluid : MonoBehaviour
             float2 x_n = p.pos + p.v;
             float wall_min = 3 - 1;
             float wall_max = (float)grid_res - 4 + 1;
-            p.v.x += (x_n.x < wall_min)? wall_min - x_n.x: 0;
-            p.v.x += (x_n.x > wall_max)? wall_max - x_n.x: 0;
-            p.v.y += (x_n.y < wall_min)? wall_min - x_n.y: 0;
-            p.v.y += (x_n.y > wall_max)? wall_max - x_n.y: 0;
+            p.v.x += (x_n.x < wall_min) ? wall_min - x_n.x : 0;
+            p.v.x += (x_n.x > wall_max) ? wall_max - x_n.x : 0;
+            p.v.y += (x_n.y < wall_min) ? wall_min - x_n.y : 0;
+            p.v.y += (x_n.y > wall_max) ? wall_max - x_n.y : 0;
             // if (x_n.x < wall_min) p.v.x += wall_min - x_n.x;
             // if (x_n.x > wall_max) p.v.x += wall_max - x_n.x;
             // if (x_n.y < wall_min) p.v.y += wall_min - x_n.y;
@@ -415,7 +415,7 @@ public class mls_mpm_Fluid : MonoBehaviour
             ps[i] = p;
         }
     }
-    
+
     [BurstCompile]
     unsafe struct PrefabRenderer : IJobParallelForTransform
     {
@@ -427,7 +427,7 @@ public class mls_mpm_Fluid : MonoBehaviour
         public void Execute(int i, TransformAccess transform)
         {
             Particle p = ps[i];
-            transform.position = math.float3((p.pos - grid_res/2)/grid_res * render_range , -.1f);
+            transform.position = math.float3((p.pos - grid_res / 2) / grid_res * render_range, -.1f);
         }
     }
 
@@ -630,7 +630,7 @@ public class mls_mpm_Fluid : MonoBehaviour
     {
         ps.Dispose();
         grid.Dispose();
-        if(usePrefab)
+        if (usePrefab)
             particle_array.Dispose();
     }
 }
