@@ -1,8 +1,8 @@
 # Material Point Method Learning&Implementation in Unity (2D)
 
-|                            Fluid                             |                         Neo-Hookean                          |
-| :----------------------------------------------------------: | :----------------------------------------------------------: |
-| ![Fluid](/Users/saber/Desktop/Projects/mls-mpm-2d/Result/Fluid.gif) | ![NeoHookean](/Users/saber/Desktop/Projects/mls-mpm-2d/Result/NeoHookean.gif) |
+|            Fluid             |              Neo-Hookean               |
+| :--------------------------: | :------------------------------------: |
+| ![Fluid](./Result/Fluid.gif) | ![NeoHookean](./Result/NeoHookean.gif) |
 
 
 
